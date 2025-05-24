@@ -1,6 +1,8 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "ui": "tui",
+  "globalDependencies": [".env", "tsconfig.json"],
+  "globalEnv": ["GOOGLE_CLIENT_ID", "NEXTAUTH_SECRET"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
