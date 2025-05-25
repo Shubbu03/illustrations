@@ -1,5 +1,9 @@
-import { loginCredentialSchema,signupSchema } from "./zod/schema";
-import { ZodError } from "zod";
+import {
+  loginCredentialSchema,
+  signupSchema,
+  signupFormSchema,
+} from "./zod/schema";
+import { z, ZodError } from "zod";
 
 //SCHEMAS
 export const NextAuthLoginCredentialsSchema = loginCredentialSchema;
@@ -7,3 +11,7 @@ export const SignupSchema = signupSchema;
 
 //EXTRA
 export const zodError = ZodError;
+
+//FRONTEND FORM
+export type LoginFormData = z.infer<typeof loginCredentialSchema>;
+export type SignupFormData = z.infer<typeof signupFormSchema>;

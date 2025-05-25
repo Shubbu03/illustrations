@@ -20,3 +20,12 @@ export const signupSchema = z.object({
       "Password must include uppercase, lowercase, number and special character"
     ),
 });
+
+export const signupFormSchema = signupSchema
+  .extend({
+    confirmPassword: z.string().min(8, "Confirm password is required"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
