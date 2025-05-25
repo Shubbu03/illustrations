@@ -1,5 +1,6 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import GitHubProvider from "next-auth/providers/github";
 import { NextAuthLoginCredentialsSchema, zodError } from "@repo/types/zod";
 import type { NextAuthOptions } from "next-auth";
 import { prisma } from "@repo/db/prisma";
@@ -10,6 +11,10 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    GitHubProvider({
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     }),
     CredentialsProvider({
       id: "credentials",
@@ -52,37 +57,55 @@ export const authOptions: NextAuthOptions = {
 
   callbacks: {
     async signIn({ user, account }) {
-      if (account?.provider === "google") {
-        const existingUser = await prisma.user.findUnique({
-          where: { email: user.email! },
-        });
-
-        if (existingUser) {
-          user.id = existingUser.id;
-          await prisma.user.update({
-            where: {
-              id: existingUser.id,
-            },
-            data: {
-              provider: "google",
-              provider_id: account.providerAccountId,
-            },
-          });
-          return true;
+      if (
+        account &&
+        (account.provider === "google" || account.provider === "github")
+      ) {
+        if (!user.email) {
+          return false;
         }
 
-        const newUser = await prisma.user.create({
-          data: {
-            email: user.email!,
-            password: "", //no password as sign in with google, can change later
-            name: user.name!,
-            provider: "google",
-            provider_id: account.providerAccountId,
-          },
-        });
+        if (!account.providerAccountId) {
+          return false;
+        }
 
-        user.id = newUser.id;
+        try {
+          const existingUser = await prisma.user.findUnique({
+            where: { email: user.email },
+          });
+
+          if (existingUser) {
+            user.id = existingUser.id;
+            await prisma.user.update({
+              where: { id: existingUser.id },
+              data: {
+                provider: account.provider,
+                provider_id: account.providerAccountId,
+                name: user.name || existingUser.name,
+              },
+            });
+          } else {
+            const newUser = await prisma.user.create({
+              data: {
+                email: user.email,
+                name: user.name!,
+                password: "",
+                provider: account.provider,
+                provider_id: account.providerAccountId,
+              },
+            });
+            user.id = newUser.id;
+          }
+          return true;
+        } catch (error) {
+          console.error(
+            `Database error during ${account.provider} OAuth sign-in:`,
+            error
+          );
+          return false;
+        }
       }
+
       return true;
     },
 
