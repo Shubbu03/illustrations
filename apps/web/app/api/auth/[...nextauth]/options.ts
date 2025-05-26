@@ -5,7 +5,7 @@ import { NextAuthLoginCredentialsSchema, zodError } from "@repo/types/zod";
 import type { NextAuthOptions } from "next-auth";
 import { prisma } from "@repo/db/prisma";
 import { comparePassword } from "@repo/auth/bcrypt";
-import { signToken } from "@repo/auth/jwt";
+import { signToken } from "@repo/auth/jwt/signToken";
 
 export const authOptions: NextAuthOptions = {
   providers: [
