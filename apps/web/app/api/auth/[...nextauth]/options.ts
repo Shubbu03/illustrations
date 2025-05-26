@@ -5,16 +5,16 @@ import { NextAuthLoginCredentialsSchema, zodError } from "@repo/types/zod";
 import type { NextAuthOptions } from "next-auth";
 import { prisma } from "@repo/db/prisma";
 import { comparePassword } from "@repo/auth/bcrypt";
-import config from "@repo/config/config";
+
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
-      clientId: config.GOOGLE_CLIENT_ID!,
-      clientSecret: config.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
     GitHubProvider({
-      clientId: config.GITHUB_CLIENT_ID!,
-      clientSecret: config.GITHUB_CLIENT_SECRET!,
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     }),
     CredentialsProvider({
       id: "credentials",
@@ -129,7 +129,7 @@ export const authOptions: NextAuthOptions = {
     error: "/auth/error",
   },
 
-  secret: config.NEXT_AUTH_SECRET,
+  secret: process.env.NEXT_AUTH_SECRET,
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60,
