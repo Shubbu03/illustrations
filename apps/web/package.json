@@ -33,7 +33,6 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/types": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@repo/config": "workspace:*",
     "@types/node": "^22.15.3",
     "@types/prop-types": "^15.7.14",
     "@types/react": "19.1.0",

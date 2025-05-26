@@ -5,6 +5,7 @@ import { NextAuthLoginCredentialsSchema, zodError } from "@repo/types/zod";
 import type { NextAuthOptions } from "next-auth";
 import { prisma } from "@repo/db/prisma";
 import { comparePassword } from "@repo/auth/bcrypt";
+import { signToken } from "@repo/auth/jwt";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -119,6 +120,13 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user && token) {
         session.user.id = token.id as string;
+        session.user.wsToken = signToken(
+          {
+            id: token.id as string,
+            email: token.email as string,
+          },
+          process.env.JWT_SECRET as string
+        );
       }
       return session;
     },
