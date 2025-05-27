@@ -1,0 +1,1 @@
+{"root":["./src/chatqueue.ts","./src/chatworker.ts","./src/index.ts","./src/redisconnection.ts","./src/start-worker.ts"],"version":"5.8.2"}
