@@ -64,35 +64,6 @@ wss.on("connection", function connection(ws, request) {
   ws.on("message", async (data) => {
     const parsed = JSON.parse(data.toString());
     switch (parsed.type) {
-      case "create_room": {
-        const slug = parsed.slug;
-        try {
-          const existing = await prisma.room.findUnique({ where: { slug } });
-          if (existing) {
-            ws.send(
-              JSON.stringify({ type: "error", message: "Room already exists." })
-            );
-            break;
-          }
-
-          const room = await prisma.room.create({
-            data: {
-              slug,
-              adminID: user.userID,
-            },
-          });
-
-          user.rooms.push(room.id.toString());
-          ws.send(JSON.stringify({ type: "room_created", slug: room.slug }));
-        } catch (error) {
-          console.error("Room creation failed:", error);
-          ws.send(
-            JSON.stringify({ type: "error", message: "Failed to create room" })
-          );
-        }
-        break;
-      }
-
       case "join_room": {
         try {
           const slug = parsed.slug;
