@@ -15,11 +15,11 @@ export async function POST() {
     const userID = session.user.id;
 
     const slug = generateSlug(2, {
-      format: "lower",
+      format: "kebab",
       partsOfSpeech: ["noun", "adjective"],
       categories: {
-        noun: ["animals", "food"],
-        adjective: ["time", "color"],
+        noun: ["animals", "food", "media"],
+        adjective: ["time", "color", "appearance"],
       },
     });
     const existing = await prisma.room.findUnique({ where: { slug } });
@@ -39,10 +39,14 @@ export async function POST() {
 
     console.log("Room created :", room);
 
-    return NextResponse.json({ message: "Canvas created", status: 201 });
+    return NextResponse.json({
+      message: "Canvas created",
+      status: 200,
+      slug: slug,
+    });
   } catch (error) {
     return NextResponse.json(
-      { error: "Error occured while creating room"},
+      { error: "Error occured while creating room" },
       { status: 500 }
     );
   }
