@@ -2,6 +2,7 @@
 
 import { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
+import QueryProvider from "./providers/QueryProvider";
 
 export function Providers({
   children,
@@ -10,5 +11,9 @@ export function Providers({
   children: React.ReactNode;
   session: Session | null;
 }) {
-  return <SessionProvider session={session}>{children}</SessionProvider>;
+  return (
+    <SessionProvider session={session}>
+      <QueryProvider>{children}</QueryProvider>
+    </SessionProvider>
+  );
 }
