@@ -1,3 +1,3 @@
-import * as config from "./config";
+import { WS_URL } from "./config";
 
-export default config;
+export default WS_URL;
