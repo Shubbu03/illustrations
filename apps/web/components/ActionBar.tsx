@@ -4,6 +4,7 @@ import {
   Circle,
   Minus,
   Type,
+  Eraser,
 } from "lucide-react";
 import { Tool } from "./Canvas";
 import { IconButton } from "./IconButton";
@@ -64,6 +65,24 @@ export function ActionBar({
         }}
         activated={selectedTool === "text"}
         icon={<Type size={20} />}
+      />
+
+      {/* Divider */}
+      <div
+        style={{
+          width: "1px",
+          height: "32px",
+          backgroundColor: "rgba(255, 255, 255, 0.2)",
+          margin: "0 0.25rem",
+        }}
+      />
+
+      <IconButton
+        onClick={() => {
+          setSelectedTool("eraser");
+        }}
+        activated={selectedTool === "eraser"}
+        icon={<Eraser size={20} />}
       />
     </div>
   );
