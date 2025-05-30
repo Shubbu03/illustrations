@@ -89,7 +89,7 @@ export function RoomCanvas({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="w-full h-full" style={{ backgroundColor: "#EAEFEF" }}>
+    <div className="w-full h-full">
       <Canvas socket={socket} slug={slug} />
     </div>
   );

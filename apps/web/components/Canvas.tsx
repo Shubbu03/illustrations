@@ -1,11 +1,10 @@
-import { Pencil, RectangleHorizontalIcon, Circle } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
-import { IconButton } from "./IconButton";
 import { Game } from "../app/game/Game";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
+import { ActionBar } from "./ActionBar";
 
-export type Tool = "circle" | "rectangle" | "pencil" | "line";
+export type Tool = "circle" | "rectangle" | "pencil" | "line" | "text";
 
 const fetchCanvasID = async (slug: string) => {
   try {
@@ -15,6 +14,31 @@ const fetchCanvasID = async (slug: string) => {
     console.error("Error fetching canvas ID:", error);
     throw error;
   }
+};
+
+const setupHighDPICanvas = (canvas: HTMLCanvasElement) => {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return 1;
+
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  const displayWidth = window.innerWidth;
+  const displayHeight = window.innerHeight;
+
+  canvas.width = displayWidth * devicePixelRatio;
+  canvas.height = displayHeight * devicePixelRatio;
+
+  canvas.style.width = displayWidth + "px";
+  canvas.style.height = displayHeight + "px";
+
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+
+  return devicePixelRatio;
 };
 
 export default function Canvas({
@@ -28,11 +52,7 @@ export default function Canvas({
   const [game, setGame] = useState<Game>();
   const [selectedTool, setSelectedTool] = useState<Tool>("circle");
 
-  const {
-    data: canvasID,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data: canvasID, error } = useQuery({
     queryKey: ["canvasID", slug],
     queryFn: () => fetchCanvasID(slug),
     enabled: !!slug,
@@ -44,18 +64,26 @@ export default function Canvas({
 
   useEffect(() => {
     if (canvasRef.current && canvasID && socket) {
-      const g = new Game(canvasRef.current, canvasID, socket);
+      const devicePixelRatio = setupHighDPICanvas(canvasRef.current);
+
+      const g = new Game(canvasRef.current, canvasID, socket, devicePixelRatio);
       setGame(g);
 
+      const handleResize = () => {
+        if (canvasRef.current) {
+          setupHighDPICanvas(canvasRef.current);
+          g.handleResize();
+        }
+      };
+
+      window.addEventListener("resize", handleResize);
+
       return () => {
+        window.removeEventListener("resize", handleResize);
         g.destroy();
       };
     }
   }, [canvasRef, canvasID, socket]);
-
-  if (isLoading) {
-    return <div>Loading canvas...</div>;
-  }
 
   if (error) {
     return <div>Error loading canvas: {error.message}</div>;
@@ -70,59 +98,15 @@ export default function Canvas({
     >
       <canvas
         ref={canvasRef}
-        width={window.innerWidth}
-        height={window.innerHeight}
+        style={{
+          display: "block",
+          touchAction: "none",
+        }}
       />
-      <Topbar setSelectedTool={setSelectedTool} selectedTool={selectedTool} />
-    </div>
-  );
-}
-
-function Topbar({
-  selectedTool,
-  setSelectedTool,
-}: {
-  selectedTool: Tool;
-  setSelectedTool: (s: Tool) => void;
-}) {
-  return (
-    <div
-      style={{
-        position: "fixed",
-        top: 10,
-        left: 10,
-      }}
-    >
-      <div className="flex gap-t">
-        <IconButton
-          onClick={() => {
-            setSelectedTool("pencil");
-          }}
-          activated={selectedTool === "pencil"}
-          icon={<Pencil />}
-        />
-        <IconButton
-          onClick={() => {
-            setSelectedTool("rectangle");
-          }}
-          activated={selectedTool === "rectangle"}
-          icon={<RectangleHorizontalIcon />}
-        ></IconButton>
-        <IconButton
-          onClick={() => {
-            setSelectedTool("circle");
-          }}
-          activated={selectedTool === "circle"}
-          icon={<Circle />}
-        ></IconButton>
-        <IconButton
-          onClick={() => {
-            setSelectedTool("line");
-          }}
-          activated={selectedTool === "line"}
-          icon={<div>L</div>}
-        ></IconButton>
-      </div>
+      <ActionBar
+        setSelectedTool={setSelectedTool}
+        selectedTool={selectedTool}
+      />
     </div>
   );
 }
