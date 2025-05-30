@@ -37,10 +37,16 @@ export class Game {
   private startY = 0;
   private selectedTool: Tool = "circle";
   private currentPencilPath: { x: number; y: number }[];
+  private devicePixelRatio: number;
 
   socket: WebSocket;
 
-  constructor(canvas: HTMLCanvasElement, roomID: string, socket: WebSocket) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    roomID: string,
+    socket: WebSocket,
+    devicePixelRatio: number = 1
+  ) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
     this.existingShapes = [];
@@ -48,20 +54,41 @@ export class Game {
     this.socket = socket;
     this.clicked = false;
     this.currentPencilPath = [];
+    this.devicePixelRatio = devicePixelRatio;
     this.init();
     this.initHandlers();
     this.initMouseHandlers();
+    this.setupCanvasContext();
+  }
+
+  private setupCanvasContext() {
+    this.ctx.lineWidth = 2;
+    this.ctx.lineCap = "round";
+    this.ctx.lineJoin = "round";
+    this.ctx.imageSmoothingEnabled = true;
+    this.ctx.imageSmoothingQuality = "high";
+  }
+
+  handleResize() {
+    this.setupCanvasContext();
+    this.clearCanvas();
+  }
+
+  private getMouseCoordinates(e: MouseEvent): { x: number; y: number } {
+    const rect = this.canvas.getBoundingClientRect();
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    };
   }
 
   destroy() {
     this.canvas.removeEventListener("mousedown", this.mouseDownHandler);
-
     this.canvas.removeEventListener("mouseup", this.mouseUpHandler);
-
     this.canvas.removeEventListener("mousemove", this.mouseMoveHandler);
   }
 
-  setTool(tool: "circle" | "pencil" | "rectangle" | "line") {
+  setTool(tool: Tool) {
     this.selectedTool = tool;
     if (tool === "pencil") {
       this.currentPencilPath = [];
@@ -87,11 +114,15 @@ export class Game {
 
   clearCanvas() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.fillStyle = "rgba(0, 0, 0)";
+    this.ctx.fillStyle = "#f8f9fa";
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.existingShapes.map((shape) => {
-      this.ctx.strokeStyle = "rgba(255, 255, 255)";
+      this.ctx.strokeStyle = "#1e1e1e";
+      this.ctx.lineWidth = 2;
+      this.ctx.lineCap = "round";
+      this.ctx.lineJoin = "round";
+
       if (shape.type === "rectangle") {
         this.ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
       } else if (shape.type === "circle") {
@@ -128,11 +159,13 @@ export class Game {
       }
     });
 
-    // Draw current pencil path if any
     if (this.selectedTool === "pencil" && this.currentPencilPath.length > 0) {
       const firstCurrentPoint = this.currentPencilPath[0];
       if (firstCurrentPoint !== undefined) {
-        this.ctx.strokeStyle = "rgba(255, 255, 255)"; // Or a different color for current drawing
+        this.ctx.strokeStyle = "#1e1e1e";
+        this.ctx.lineWidth = 2;
+        this.ctx.lineCap = "round";
+        this.ctx.lineJoin = "round";
         this.ctx.beginPath();
         this.ctx.moveTo(firstCurrentPoint.x, firstCurrentPoint.y);
         for (let i = 1; i < this.currentPencilPath.length; i++) {
@@ -146,18 +179,21 @@ export class Game {
     }
   }
 
-  mouseDownHandler = (e: { clientX: number; clientY: number }) => {
+  mouseDownHandler = (e: MouseEvent) => {
     this.clicked = true;
-    this.startX = e.clientX;
-    this.startY = e.clientY;
+    const coords = this.getMouseCoordinates(e);
+    this.startX = coords.x;
+    this.startY = coords.y;
     if (this.selectedTool === "pencil") {
       this.currentPencilPath = [{ x: this.startX, y: this.startY }];
     }
   };
-  mouseUpHandler = (e: { clientX: number; clientY: number }) => {
+
+  mouseUpHandler = (e: MouseEvent) => {
     this.clicked = false;
-    const width = e.clientX - this.startX;
-    const height = e.clientY - this.startY;
+    const coords = this.getMouseCoordinates(e);
+    const width = coords.x - this.startX;
+    const height = coords.y - this.startY;
 
     const selectedTool = this.selectedTool;
     let shape: Shape | null = null;
@@ -183,23 +219,23 @@ export class Game {
           this.currentPencilPath[this.currentPencilPath.length - 1];
         if (
           lastPoint !== undefined &&
-          (lastPoint.x !== e.clientX || lastPoint.y !== e.clientY)
+          (lastPoint.x !== coords.x || lastPoint.y !== coords.y)
         ) {
-          this.currentPencilPath.push({ x: e.clientX, y: e.clientY });
+          this.currentPencilPath.push({ x: coords.x, y: coords.y });
         }
         shape = {
           type: "pencil",
           points: [...this.currentPencilPath],
         };
       }
-      this.currentPencilPath = []; // Clear current path
+      this.currentPencilPath = [];
     } else if (selectedTool === "line") {
       shape = {
         type: "line",
         startX: this.startX,
         startY: this.startY,
-        endX: e.clientX,
-        endY: e.clientY,
+        endX: coords.x,
+        endY: coords.y,
       };
     }
 
@@ -219,12 +255,18 @@ export class Game {
       })
     );
   };
-  mouseMoveHandler = (e: { clientX: number; clientY: number }) => {
+
+  mouseMoveHandler = (e: MouseEvent) => {
     if (this.clicked) {
-      const currentX = e.clientX;
-      const currentY = e.clientY;
+      const coords = this.getMouseCoordinates(e);
+      const currentX = coords.x;
+      const currentY = coords.y;
       this.clearCanvas();
-      this.ctx.strokeStyle = "rgba(255, 255, 255)";
+      this.ctx.strokeStyle = "#1e1e1e";
+      this.ctx.lineWidth = 2;
+      this.ctx.lineCap = "round";
+      this.ctx.lineJoin = "round";
+
       const selectedTool = this.selectedTool;
       if (selectedTool === "rectangle") {
         const width = currentX - this.startX;
@@ -242,7 +284,6 @@ export class Game {
         this.ctx.closePath();
       } else if (selectedTool === "pencil") {
         this.currentPencilPath.push({ x: currentX, y: currentY });
-        // The drawing of the current path is handled by clearCanvas
       } else if (selectedTool === "line") {
         this.ctx.beginPath();
         this.ctx.moveTo(this.startX, this.startY);
@@ -254,9 +295,7 @@ export class Game {
 
   initMouseHandlers() {
     this.canvas.addEventListener("mousedown", this.mouseDownHandler);
-
     this.canvas.addEventListener("mouseup", this.mouseUpHandler);
-
     this.canvas.addEventListener("mousemove", this.mouseMoveHandler);
   }
 }
