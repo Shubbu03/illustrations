@@ -67,11 +67,10 @@ export function ActionBar({
         icon={<Type size={20} />}
       />
 
-      {/* Divider */}
       <div
         style={{
           width: "1px",
-          height: "32px",
+          height: "34px",
           backgroundColor: "rgba(255, 255, 255, 0.2)",
           margin: "0 0.25rem",
         }}
