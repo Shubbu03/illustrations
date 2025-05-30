@@ -3,16 +3,16 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../../auth/[...nextauth]/options";
 
-export async function GET(
+export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ canvasID: string }> }
+  { params }: { params: Promise<{ chatId: string }> }
 ) {
   try {
-    const canvasID = (await params).canvasID;
+    const chatId = (await params).chatId;
 
-    if (!canvasID) {
+    if (!chatId) {
       return NextResponse.json(
-        { error: "Canvas ID is required" },
+        { error: "Chat ID is required" },
         { status: 400 }
       );
     }
@@ -23,32 +23,21 @@ export async function GET(
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const shapes = await prisma.chat.findMany({
+    // Delete the chat message
+    await prisma.chat.delete({
       where: {
-        roomID: Number(canvasID),
-      },
-      orderBy: {
-        id: "desc",
-      },
-      take: 50,
-      select: {
-        id: true,
-        message: true,
+        id: Number(chatId),
       },
     });
 
-    if (!shapes) {
-      return NextResponse.json({ error: "Room not found" }, { status: 404 });
-    }
-
     return NextResponse.json({
-      message: "Canvas shapes fetched",
-      shapes: shapes,
+      message: "Chat deleted successfully",
       status: 200,
     });
   } catch (error) {
+    console.error("Error deleting chat:", error);
     return NextResponse.json(
-      { error: "Failed to fetch chats" },
+      { error: "Failed to delete chat" },
       { status: 500 }
     );
   }
