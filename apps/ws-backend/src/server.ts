@@ -159,6 +159,39 @@ wss.on("connection", function connection(ws, request) {
         break;
       }
 
+      case "erase_chat": {
+        try {
+          const { roomID, chatId } = parsed;
+
+          await chatQueue.add("erase_chat", { chatId, roomID, userID });
+
+          const subscribers = roomSubscriptions.get(roomID);
+          if (subscribers) {
+            subscribers.forEach((subscriberWs) => {
+              if (subscriberWs.readyState === WebSocket.OPEN) {
+                subscriberWs.send(
+                  JSON.stringify({
+                    type: "erase_chat",
+                    chatId,
+                    roomID,
+                    userID,
+                  })
+                );
+              }
+            });
+          }
+        } catch (error) {
+          console.error("Erase chat message failed:", error);
+          ws.send(
+            JSON.stringify({
+              type: "error",
+              message: "Failed to erase chat message",
+            })
+          );
+        }
+        break;
+      }
+
       default:
         ws.send(
           JSON.stringify({ type: "error", message: "Unknown message type" })
