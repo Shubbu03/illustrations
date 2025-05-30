@@ -11,8 +11,10 @@ export function IconButton({
 }) {
   return (
     <div
-      className={`m-2 pointer rounded-full border p-2 bg-black hover:bg-gray ${activated ? "text-red-400" : "text-white"}`}
+      className={`p-2 rounded-lg cursor-pointer transition-colors flex items-center justify-center
+        ${activated ? "bg-[#7F8CAA] text-white" : "text-gray-100 hover:bg-neutral-700"}`}
       onClick={onClick}
+      style={{ minWidth: "36px", minHeight: "36px" }}
     >
       {icon}
     </div>
