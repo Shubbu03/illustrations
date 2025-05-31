@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Tool } from "./Canvas";
 import { IconButton } from "./IconButton";
+import ThemeToggle from "./ThemeToggle";
 
 export function ActionBar({
   selectedTool,
@@ -83,6 +84,17 @@ export function ActionBar({
         activated={selectedTool === "eraser"}
         icon={<Eraser size={20} />}
       />
+
+      <div
+        style={{
+          width: "1px",
+          height: "34px",
+          backgroundColor: "rgba(255, 255, 255, 0.2)",
+          margin: "0 0.25rem",
+        }}
+      />
+
+      <ThemeToggle />
     </div>
   );
 }

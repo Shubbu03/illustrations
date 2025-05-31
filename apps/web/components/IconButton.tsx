@@ -1,16 +1,16 @@
-import { ReactNode } from "react";
+import { ReactNode, forwardRef } from "react";
 
-export function IconButton({
-  icon,
-  onClick,
-  activated,
-}: {
-  icon: ReactNode;
-  onClick: () => void;
-  activated: boolean;
-}) {
+export const IconButton = forwardRef<
+  HTMLDivElement,
+  {
+    icon: ReactNode;
+    onClick: () => void;
+    activated: boolean;
+  }
+>(({ icon, onClick, activated }, ref) => {
   return (
     <div
+      ref={ref}
       className={`p-2 rounded-lg cursor-pointer transition-colors flex items-center justify-center
         ${activated ? "bg-[#7F8CAA] text-white" : "text-gray-100 hover:bg-neutral-700"}`}
       onClick={onClick}
@@ -19,4 +19,6 @@ export function IconButton({
       {icon}
     </div>
   );
-}
+});
+
+IconButton.displayName = "IconButton";

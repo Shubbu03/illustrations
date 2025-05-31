@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 import { Game } from "../app/game/Game";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
@@ -57,6 +58,7 @@ export default function Canvas({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [game, setGame] = useState<Game>();
   const [selectedTool, setSelectedTool] = useState<Tool>("circle");
+  const { resolvedTheme } = useTheme();
 
   const { data: canvasID, error } = useQuery({
     queryKey: ["canvasID", slug],
@@ -69,10 +71,22 @@ export default function Canvas({
   }, [selectedTool, game]);
 
   useEffect(() => {
-    if (canvasRef.current && canvasID && socket) {
+    if (game && resolvedTheme) {
+      game.setTheme(resolvedTheme as "light" | "dark");
+    }
+  }, [resolvedTheme, game]);
+
+  useEffect(() => {
+    if (canvasRef.current && canvasID && socket && resolvedTheme) {
       const devicePixelRatio = setupHighDPICanvas(canvasRef.current);
 
-      const g = new Game(canvasRef.current, canvasID, socket, devicePixelRatio);
+      const g = new Game(
+        canvasRef.current,
+        canvasID,
+        socket,
+        devicePixelRatio,
+        resolvedTheme as "light" | "dark"
+      );
       setGame(g);
 
       const handleResize = () => {
@@ -89,7 +103,7 @@ export default function Canvas({
         g.destroy();
       };
     }
-  }, [canvasRef, canvasID, socket]);
+  }, [canvasRef, canvasID, socket, resolvedTheme]);
 
   if (error) {
     return <div>Error loading canvas: {error.message}</div>;

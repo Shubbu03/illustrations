@@ -50,6 +50,7 @@ export class Game {
   private eraserTrail: { x: number; y: number }[] = [];
   private isErasing = false;
   private localShapeIdCounter = 0;
+  private theme: "light" | "dark" = "light";
 
   socket: WebSocket;
 
@@ -57,7 +58,8 @@ export class Game {
     canvas: HTMLCanvasElement,
     roomID: string,
     socket: WebSocket,
-    devicePixelRatio: number = 1
+    devicePixelRatio: number = 1,
+    theme: "light" | "dark" = "light"
   ) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
@@ -67,6 +69,7 @@ export class Game {
     this.clicked = false;
     this.currentPencilPath = [];
     this.devicePixelRatio = devicePixelRatio;
+    this.theme = theme;
     this.init();
     this.initHandlers();
     this.initMouseHandlers();
@@ -118,6 +121,15 @@ export class Game {
     }
   }
 
+  setTheme(theme: "light" | "dark") {
+    this.theme = theme;
+    this.clearCanvas();
+  }
+
+  private getStrokeColor(): string {
+    return this.theme === "dark" ? "#e0e0e0" : "#1e1e1e";
+  }
+
   async init() {
     this.existingShapes = await getExistingShapes(this.roomID);
     this.clearCanvas();
@@ -127,23 +139,64 @@ export class Game {
     this.socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
 
-      if (message.type == "chat") {
-        const parsedShape = JSON.parse(message.message);
-        const incomingShape = parsedShape.shape;
+      if (message.type === "chat") {
+        const payload = JSON.parse(message.message);
+        const incomingShape = payload.shape as Shape;
 
-        const existsLocally = this.existingShapes.some((localShape) => {
-          return this.shapesAreEqual(localShape, incomingShape);
-        });
+        let existingShapeIndex = -1;
+        let shapeToUpdate: Shape | undefined = undefined;
 
-        if (!existsLocally) {
-          this.existingShapes.push(incomingShape);
+        if (incomingShape.localId) {
+          existingShapeIndex = this.existingShapes.findIndex(
+            (s) => s.localId === incomingShape.localId
+          );
+          if (existingShapeIndex !== -1) {
+            shapeToUpdate = this.existingShapes[existingShapeIndex];
+            if (shapeToUpdate && incomingShape.dbId && !shapeToUpdate.dbId) {
+              shapeToUpdate.dbId = incomingShape.dbId;
+            }
+          }
+        }
+
+        if (!shapeToUpdate && incomingShape.dbId) {
+          const dbIndex = this.existingShapes.findIndex(
+            (s) => s.dbId === incomingShape.dbId
+          );
+          if (dbIndex !== -1) {
+            shapeToUpdate = this.existingShapes[dbIndex];
+          }
+        }
+
+        if (!shapeToUpdate) {
+          const structurallyExists = this.existingShapes.some((localShape) => {
+            if (
+              incomingShape.dbId &&
+              localShape.dbId &&
+              incomingShape.dbId === localShape.dbId
+            ) {
+              return true;
+            }
+            return this.shapesAreEqual(localShape, incomingShape);
+          });
+
+          if (!structurallyExists) {
+            this.existingShapes.push(incomingShape);
+          }
+        }
+
+        this.clearCanvas();
+      } else if (message.type == "erase_chat") {
+        const erasedDbId =
+          typeof message.chatId === "string"
+            ? parseInt(message.chatId, 10)
+            : message.chatId;
+
+        if (erasedDbId !== undefined && !isNaN(erasedDbId)) {
+          this.existingShapes = this.existingShapes.filter(
+            (shape) => shape.dbId !== erasedDbId
+          );
           this.clearCanvas();
         }
-      } else if (message.type == "erase_chat") {
-        this.existingShapes = this.existingShapes.filter(
-          (shape) => shape.dbId !== message.chatId
-        );
-        this.clearCanvas();
       }
     };
   }
@@ -185,11 +238,14 @@ export class Game {
 
   clearCanvas() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.fillStyle = "#f8f9fa";
+
+    this.ctx.fillStyle = this.theme === "dark" ? "#1a1a1a" : "#f8f9fa";
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
+    const strokeColor = this.getStrokeColor();
+
     this.existingShapes.map((shape) => {
-      this.ctx.strokeStyle = "#1e1e1e";
+      this.ctx.strokeStyle = strokeColor;
       this.ctx.lineWidth = 2;
       this.ctx.lineCap = "round";
       this.ctx.lineJoin = "round";
@@ -233,7 +289,7 @@ export class Game {
     if (this.selectedTool === "pencil" && this.currentPencilPath.length > 0) {
       const firstCurrentPoint = this.currentPencilPath[0];
       if (firstCurrentPoint !== undefined) {
-        this.ctx.strokeStyle = "#1e1e1e";
+        this.ctx.strokeStyle = this.getStrokeColor();
         this.ctx.lineWidth = 2;
         this.ctx.lineCap = "round";
         this.ctx.lineJoin = "round";
@@ -357,7 +413,7 @@ export class Game {
         this.drawEraserCursor(currentX, currentY);
       } else {
         this.clearCanvas();
-        this.ctx.strokeStyle = "#1e1e1e";
+        this.ctx.strokeStyle = this.getStrokeColor();
         this.ctx.lineWidth = 2;
         this.ctx.lineCap = "round";
         this.ctx.lineJoin = "round";
