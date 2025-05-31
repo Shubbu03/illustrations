@@ -8,6 +8,8 @@ import {
   UserSearch,
   Loader2,
   PackageOpen,
+  Github,
+  Brush,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
@@ -104,20 +106,50 @@ const Dashboard = () => {
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Month is 0-indexed
+    const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
     return `${day}-${month}-${year}`;
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#EAEFEF" }}>
-      <div className="pt-10 px-4">
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ backgroundColor: "#EAEFEF" }}
+    >
+      <header className="w-full py-4 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center">
+            <div className="flex items-center gap-3 cursor-pointer">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
+                style={{ backgroundColor: "#7F8CAA" }}
+              >
+                <Brush className="w-6 h-6 text-white" />
+              </div>
+              <div className="group">
+                <h1
+                  className="text-2xl font-bold tracking-tight"
+                  style={{ color: "#333446" }}
+                >
+                  Ilustraciones
+                </h1>
+                <div
+                  className="h-0.5 w-0 group-hover:w-full transition-all duration-300 ease-out"
+                  style={{ backgroundColor: "#7F8CAA" }}
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="flex-1 px-4 pb-8">
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h1 className="text-3xl font-bold" style={{ color: "#333446" }}>
+              <h2 className="text-3xl font-bold" style={{ color: "#333446" }}>
                 My Illustrations
-              </h1>
+              </h2>
               <div className="flex space-x-2">
                 <div className="relative">
                   <button
@@ -170,13 +202,13 @@ const Dashboard = () => {
           </div>
 
           <div className="mb-12">
-            <h2
+            <h3
               className="text-xl font-semibold mb-6 flex items-center gap-2"
               style={{ color: "#333446" }}
             >
               <Palette className="w-5 h-5" />
               Canvas
-            </h2>
+            </h3>
 
             {isLoadingCanvases ? (
               <div className="flex justify-center items-center h-64">
@@ -188,12 +220,12 @@ const Dashboard = () => {
             ) : isErrorFetchingCanvases ? (
               <div className="flex flex-col items-center justify-center h-64 text-center">
                 <PackageOpen className="w-16 h-16 mb-4 text-red-500" />
-                <h3
+                <h4
                   className="text-xl font-semibold mb-2"
                   style={{ color: "#333446" }}
                 >
                   Error Fetching Canvas
-                </h3>
+                </h4>
                 <p
                   className="text-md"
                   style={{ color: "#333446", opacity: 0.7 }}
@@ -221,13 +253,13 @@ const Dashboard = () => {
                         >
                           <Palette className="w-4 h-4 text-white" />
                         </div>
-                        <h3
+                        <h4
                           className="font-semibold text-lg truncate"
                           style={{ color: "#333446" }}
                           title={canvas.slug}
                         >
                           {canvas.slug || `Canvas ${canvas.id.substring(0, 6)}`}
-                        </h3>
+                        </h4>
                       </div>
                       <button className="p-1 rounded-full hover:bg-white/50 transition-colors">
                         <MoreHorizontal
@@ -241,7 +273,7 @@ const Dashboard = () => {
                         className="text-xs"
                         style={{ color: "#333446", opacity: 0.6 }}
                       >
-                       Created at: {formatDate(canvas.createdAt)}
+                        Created at: {formatDate(canvas.createdAt)}
                       </p>
                     )}
                   </div>
@@ -253,12 +285,12 @@ const Dashboard = () => {
                   className="w-16 h-16 mb-4"
                   style={{ color: "#7F8CAA" }}
                 />
-                <h3
+                <h4
                   className="text-xl font-semibold mb-2"
                   style={{ color: "#333446" }}
                 >
                   No Canvas Yet
-                </h3>
+                </h4>
                 <p
                   className="text-md"
                   style={{ color: "#333446", opacity: 0.7 }}
@@ -270,6 +302,27 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      <footer
+        className="w-full py-6 mt-auto"
+        style={{ backgroundColor: "#7F8CAA" }}
+      >
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center justify-center">
+            <p className="text-white text-sm flex items-center gap-2">
+              Made with ❤️ by shubham
+              <a
+                href="https://github.com/Shubbu03"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 ml-2 hover:text-gray-200 transition-colors duration-200"
+              >
+                <Github className="w-4 h-4" />
+              </a>
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
