@@ -3,7 +3,6 @@ import {
   RectangleHorizontalIcon,
   Circle,
   Minus,
-  Type,
   Eraser,
 } from "lucide-react";
 import { Tool } from "./Canvas";
@@ -59,13 +58,6 @@ export function ActionBar({
         }}
         activated={selectedTool === "line"}
         icon={<Minus size={20} />}
-      />
-      <IconButton
-        onClick={() => {
-          setSelectedTool("text");
-        }}
-        activated={selectedTool === "text"}
-        icon={<Type size={20} />}
       />
 
       <div
