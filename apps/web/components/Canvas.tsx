@@ -5,13 +5,7 @@ import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { ActionBar } from "./ActionBar";
 
-export type Tool =
-  | "circle"
-  | "rectangle"
-  | "pencil"
-  | "line"
-  | "text"
-  | "eraser";
+export type Tool = "circle" | "rectangle" | "pencil" | "line" | "eraser";
 
 const fetchCanvasID = async (slug: string) => {
   try {
