@@ -10,9 +10,10 @@ import {
   PackageOpen,
   Github,
   Brush,
+  Trash2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import JoinCanvasDropdown from "../../components/JoinCanvasDropDown";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -37,10 +38,19 @@ const createCanvas = async (): Promise<{ slug: string }> => {
   throw new Error(response.data.message || "Failed to create canvas");
 };
 
+const deleteCanvas = async (slug: string): Promise<void> => {
+  const response = await axios.delete(`/api/delete-canvas/${slug}`);
+  if (response.data.status !== 200) {
+    throw new Error(response.data.message || "Failed to delete canvas");
+  }
+};
+
 const Dashboard = () => {
   const [isJoinDropdownOpen, setIsJoinDropdownOpen] = useState(false);
   const [roomNotFound, setRoomNotFound] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [deletingCanvasId, setDeletingCanvasId] = useState<string | null>(null);
   const joinButtonRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -70,6 +80,33 @@ const Dashboard = () => {
       console.error("Error occurred while creating room", error);
     },
   });
+
+  const deleteCanvasMutation = useMutation<void, Error, string>({
+    mutationFn: deleteCanvas,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["canvases"] });
+      setOpenDropdownId(null);
+      setDeletingCanvasId(null);
+    },
+    onError: (error) => {
+      console.error("Error occurred while deleting canvas", error);
+      setDeletingCanvasId(null);
+    },
+  });
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest(".canvas-dropdown")) {
+        setOpenDropdownId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleAddNew = () => {
     createCanvasMutation.mutate();
@@ -101,6 +138,16 @@ const Dashboard = () => {
     } finally {
       setIsJoining(false);
     }
+  };
+
+  const handleDeleteCanvas = (slug: string, canvasId: string) => {
+    setDeletingCanvasId(canvasId);
+    deleteCanvasMutation.mutate(slug);
+  };
+
+  const toggleDropdown = (canvasId: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    setOpenDropdownId(openDropdownId === canvasId ? null : canvasId);
   };
 
   const formatDate = (dateString: string): string => {
@@ -261,12 +308,39 @@ const Dashboard = () => {
                           {canvas.slug || `Canvas ${canvas.id.substring(0, 6)}`}
                         </h4>
                       </div>
-                      <button className="p-1 rounded-full hover:bg-white/50 transition-colors">
-                        <MoreHorizontal
-                          className="w-4 h-4"
-                          style={{ color: "#333446" }}
-                        />
-                      </button>
+                      <div className="relative canvas-dropdown">
+                        <button
+                          onClick={(e) => toggleDropdown(canvas.id, e)}
+                          className="p-1 rounded-full hover:bg-white/50 transition-colors"
+                          disabled={deletingCanvasId === canvas.id}
+                        >
+                          {deletingCanvasId === canvas.id ? (
+                            <Loader2
+                              className="w-4 h-4 animate-spin"
+                              style={{ color: "#333446" }}
+                            />
+                          ) : (
+                            <MoreHorizontal
+                              className="w-4 h-4"
+                              style={{ color: "#333446" }}
+                            />
+                          )}
+                        </button>
+                        {openDropdownId === canvas.id && (
+                          <div className="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10 min-w-[120px] cursor-pointer">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteCanvas(canvas.slug, canvas.id);
+                              }}
+                              className="w-full flex items-center gap-2 px-3 py-1 text-red-600 hover:bg-gray-100 transition-colors text-sm cursor-pointer"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                     {canvas.createdAt && (
                       <p
