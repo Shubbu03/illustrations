@@ -2,6 +2,7 @@
 
 import { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
+import { ThemeProvider } from "next-themes";
 import QueryProvider from "./providers/QueryProvider";
 
 export function Providers({
@@ -13,7 +14,9 @@ export function Providers({
 }) {
   return (
     <SessionProvider session={session}>
-      <QueryProvider>{children}</QueryProvider>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <QueryProvider>{children}</QueryProvider>
+      </ThemeProvider>
     </SessionProvider>
   );
 }
