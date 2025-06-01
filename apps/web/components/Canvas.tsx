@@ -1,9 +1,11 @@
 import { useRef, useState, useEffect } from "react";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
 import { Game } from "../app/game/Game";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { ActionBar } from "./ActionBar";
+import { Home } from "lucide-react";
 
 export type Tool = "circle" | "rectangle" | "pencil" | "line" | "eraser";
 
@@ -52,7 +54,9 @@ export default function Canvas({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [game, setGame] = useState<Game>();
   const [selectedTool, setSelectedTool] = useState<Tool>("circle");
+  const [roomID, setRoomID] = useState<string>("");
   const { resolvedTheme } = useTheme();
+  const router = useRouter();
 
   const { data: canvasID, error } = useQuery({
     queryKey: ["canvasID", slug],
@@ -99,6 +103,19 @@ export default function Canvas({
     }
   }, [canvasRef, canvasID, socket, resolvedTheme]);
 
+  const handleGoHome = () => {
+    if (socket && slug) {
+      socket.send(
+        JSON.stringify({
+          type: "leave_room",
+          roomID: canvasID,
+        })
+      );
+    }
+
+    router.replace("/dashboard");
+  };
+
   if (error) {
     return <div>Error loading canvas: {error.message}</div>;
   }
@@ -108,8 +125,17 @@ export default function Canvas({
       style={{
         height: "100vh",
         overflow: "hidden",
+        position: "relative",
       }}
     >
+      <button
+        onClick={handleGoHome}
+        className="absolute top-4 left-4 z-10 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 p-2 rounded-lg shadow-lg transition-colors duration-200 border border-gray-200 dark:border-gray-600 cursor-pointer"
+        aria-label="Go to Dashboard"
+      >
+        <Home size={20} />
+      </button>
+
       <canvas
         ref={canvasRef}
         style={{
