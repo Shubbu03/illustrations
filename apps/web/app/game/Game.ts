@@ -588,7 +588,7 @@ export class Game {
         });
 
       case "diamond": {
-        // Diamond collision detection using bounding box for simplicity
+
         const halfWidth = shape.width / 2;
         const halfHeight = shape.height / 2;
         return (
@@ -716,5 +716,23 @@ export class Game {
     this.ctx.lineTo(centerX - halfWidth, centerY); // left
     this.ctx.closePath();
     this.ctx.stroke();
+  }
+
+  downloadAsJPEG(slug?: string) {
+    const tempCanvas = document.createElement("canvas");
+    const tempCtx = tempCanvas.getContext("2d")!;
+
+    tempCanvas.width = this.canvas.width;
+    tempCanvas.height = this.canvas.height;
+
+    tempCtx.fillStyle = "#ffffff";
+    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+    tempCtx.drawImage(this.canvas, 0, 0);
+
+    const link = document.createElement("a");
+    link.download = `canvas-${slug || Date.now()}.jpeg`;
+    link.href = tempCanvas.toDataURL("image/jpeg", 0.9);
+    link.click();
   }
 }

@@ -5,7 +5,8 @@ import { Game } from "../app/game/Game";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { ActionBar } from "./ActionBar";
-import { Home } from "lucide-react";
+import { Home, Share2, Download } from "lucide-react";
+import ShareModal from "./ShareModal";
 
 export type Tool =
   | "circle"
@@ -60,6 +61,7 @@ export default function Canvas({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [game, setGame] = useState<Game>();
   const [selectedTool, setSelectedTool] = useState<Tool>("circle");
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const { resolvedTheme } = useTheme();
   const router = useRouter();
 
@@ -121,6 +123,16 @@ export default function Canvas({
     router.replace("/dashboard");
   };
 
+  const handleShare = () => {
+    setIsShareModalOpen(true);
+  };
+
+  const handleDownload = () => {
+    if (game) {
+      game.downloadAsJPEG(slug);
+    }
+  };
+
   if (error) {
     return <div>Error loading canvas: {error.message}</div>;
   }
@@ -141,6 +153,24 @@ export default function Canvas({
         <Home size={20} />
       </button>
 
+      <div className="absolute top-4 right-4 z-10 flex gap-2">
+        <button
+          onClick={handleShare}
+          className="bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 p-2 rounded-lg shadow-lg transition-colors duration-200 border border-gray-200 dark:border-gray-600 cursor-pointer"
+          aria-label="Share Canvas"
+        >
+          <Share2 size={20} />
+        </button>
+
+        <button
+          onClick={handleDownload}
+          className="bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 p-2 rounded-lg shadow-lg transition-colors duration-200 border border-gray-200 dark:border-gray-600 cursor-pointer"
+          aria-label="Download as JPEG"
+        >
+          <Download size={20} />
+        </button>
+      </div>
+
       <canvas
         ref={canvasRef}
         style={{
@@ -151,6 +181,12 @@ export default function Canvas({
       <ActionBar
         setSelectedTool={setSelectedTool}
         selectedTool={selectedTool}
+      />
+
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        slug={slug}
       />
     </div>
   );
