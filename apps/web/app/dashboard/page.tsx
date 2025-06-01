@@ -11,11 +11,13 @@ import {
   Github,
   Brush,
   Trash2,
+  LogOut,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import JoinCanvasDropdown from "../../components/JoinCanvasDropDown";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { signOut } from "next-auth/react";
 
 interface CanvasItem {
   id: string;
@@ -43,6 +45,10 @@ const deleteCanvas = async (slug: string): Promise<void> => {
   if (response.data.status !== 200) {
     throw new Error(response.data.message || "Failed to delete canvas");
   }
+};
+
+const handleLogout = () => {
+  signOut();
 };
 
 const Dashboard = () => {
@@ -240,6 +246,16 @@ const Dashboard = () => {
                       New Illustration
                     </>
                   )}
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 px-5 py-3 rounded-full font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
+                  style={{
+                    backgroundColor: "#7F8CAA",
+                    color: "white",
+                  }}
+                >
+                  <LogOut className="w-5 h-5" />
                 </button>
               </div>
             </div>

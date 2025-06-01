@@ -54,7 +54,6 @@ export default function Canvas({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [game, setGame] = useState<Game>();
   const [selectedTool, setSelectedTool] = useState<Tool>("circle");
-  const [roomID, setRoomID] = useState<string>("");
   const { resolvedTheme } = useTheme();
   const router = useRouter();
 
