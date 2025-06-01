@@ -10,6 +10,7 @@ type Shape =
       height: number;
       dbId?: number;
       localId?: string;
+      fillColor?: string | null;
     }
   | {
       type: "circle";
@@ -18,12 +19,14 @@ type Shape =
       radius: number;
       dbId?: number;
       localId?: string;
+      fillColor?: string | null;
     }
   | {
       type: "pencil";
       points: { x: number; y: number }[];
       dbId?: number;
       localId?: string;
+      fillColor?: string | null;
     }
   | {
       type: "line";
@@ -33,6 +36,7 @@ type Shape =
       endY: number;
       dbId?: number;
       localId?: string;
+      fillColor?: string | null;
     }
   | {
       type: "diamond";
@@ -42,6 +46,7 @@ type Shape =
       height: number;
       dbId?: number;
       localId?: string;
+      fillColor?: string | null;
     };
 
 export class Game {
@@ -60,6 +65,7 @@ export class Game {
   private isErasing = false;
   private localShapeIdCounter = 0;
   private theme: "light" | "dark" = "light";
+  private fillColor: string | null = null;
 
   socket: WebSocket;
 
@@ -125,9 +131,15 @@ export class Game {
 
     if (tool === "eraser") {
       this.canvas.style.cursor = "none";
+    } else if (tool === "fill") {
+      this.canvas.style.cursor = "pointer";
     } else {
       this.canvas.style.cursor = "crosshair";
     }
+  }
+
+  setFillColor(color: string | null) {
+    this.fillColor = color;
   }
 
   setTheme(theme: "light" | "dark") {
@@ -268,6 +280,10 @@ export class Game {
       this.ctx.lineJoin = "round";
 
       if (shape.type === "rectangle") {
+        if (shape.fillColor) {
+          this.ctx.fillStyle = shape.fillColor;
+          this.ctx.fillRect(shape.x, shape.y, shape.width, shape.height);
+        }
         this.ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
       } else if (shape.type === "circle") {
         this.ctx.beginPath();
@@ -278,6 +294,10 @@ export class Game {
           0,
           Math.PI * 2
         );
+        if (shape.fillColor) {
+          this.ctx.fillStyle = shape.fillColor;
+          this.ctx.fill();
+        }
         this.ctx.stroke();
         this.ctx.closePath();
       } else if (shape.type === "pencil") {
@@ -306,7 +326,8 @@ export class Game {
           shape.centerX,
           shape.centerY,
           shape.width,
-          shape.height
+          shape.height,
+          shape.fillColor
         );
       }
     });
@@ -337,6 +358,11 @@ export class Game {
     this.startX = coords.x;
     this.startY = coords.y;
 
+    if (this.selectedTool === "fill") {
+      this.fillShapeAt(coords.x, coords.y);
+      return;
+    }
+
     if (this.selectedTool === "eraser") {
       this.isErasing = true;
       this.eraserTrail = [{ x: coords.x, y: coords.y }];
@@ -356,6 +382,10 @@ export class Game {
       return;
     }
 
+    if (this.selectedTool === "fill") {
+      return;
+    }
+
     const coords = this.getMouseCoordinates(e);
     const width = coords.x - this.startX;
     const height = coords.y - this.startY;
@@ -369,6 +399,7 @@ export class Game {
         y: this.startY,
         height,
         width,
+        fillColor: this.fillColor,
       };
     } else if (selectedTool === "circle") {
       const radius = Math.max(Math.abs(width), Math.abs(height)) / 2;
@@ -377,6 +408,7 @@ export class Game {
         radius: radius,
         centerX: this.startX + (width > 0 ? radius : -radius),
         centerY: this.startY + (height > 0 ? radius : -radius),
+        fillColor: this.fillColor,
       };
     } else if (selectedTool === "pencil") {
       if (this.currentPencilPath.length > 0) {
@@ -391,6 +423,7 @@ export class Game {
         shape = {
           type: "pencil",
           points: [...this.currentPencilPath],
+          fillColor: this.fillColor,
         };
       }
       this.currentPencilPath = [];
@@ -401,6 +434,7 @@ export class Game {
         startY: this.startY,
         endX: coords.x,
         endY: coords.y,
+        fillColor: this.fillColor,
       };
     } else if (selectedTool === "diamond") {
       const centerX = this.startX + width / 2;
@@ -411,6 +445,7 @@ export class Game {
         centerY,
         width: Math.abs(width),
         height: Math.abs(height),
+        fillColor: this.fillColor,
       };
     }
 
@@ -440,6 +475,8 @@ export class Game {
 
     if (this.selectedTool === "eraser") {
       this.canvas.style.cursor = "none";
+    } else if (this.selectedTool === "fill") {
+      this.canvas.style.cursor = "pointer";
     } else {
       this.canvas.style.cursor = "crosshair";
     }
@@ -462,6 +499,10 @@ export class Game {
         if (selectedTool === "rectangle") {
           const width = currentX - this.startX;
           const height = currentY - this.startY;
+          if (this.fillColor) {
+            this.ctx.fillStyle = this.fillColor;
+            this.ctx.fillRect(this.startX, this.startY, width, height);
+          }
           this.ctx.strokeRect(this.startX, this.startY, width, height);
         } else if (selectedTool === "circle") {
           const width = currentX - this.startX;
@@ -471,6 +512,10 @@ export class Game {
           const centerY = this.startY + (height > 0 ? radius : -radius);
           this.ctx.beginPath();
           this.ctx.arc(centerX, centerY, Math.abs(radius), 0, Math.PI * 2);
+          if (this.fillColor) {
+            this.ctx.fillStyle = this.fillColor;
+            this.ctx.fill();
+          }
           this.ctx.stroke();
           this.ctx.closePath();
         } else if (selectedTool === "pencil") {
@@ -486,7 +531,7 @@ export class Game {
           const height = currentY - this.startY;
           const centerX = this.startX + width / 2;
           const centerY = this.startY + height / 2;
-          this.drawDiamond(centerX, centerY, width, height);
+          this.drawDiamond(centerX, centerY, width, height, this.fillColor);
         }
       }
     }
@@ -588,7 +633,6 @@ export class Game {
         });
 
       case "diamond": {
-
         const halfWidth = shape.width / 2;
         const halfHeight = shape.height / 2;
         return (
@@ -704,7 +748,8 @@ export class Game {
     centerX: number,
     centerY: number,
     width: number,
-    height: number
+    height: number,
+    fillColor?: string | null
   ) {
     const halfWidth = Math.abs(width) / 2;
     const halfHeight = Math.abs(height) / 2;
@@ -715,7 +760,32 @@ export class Game {
     this.ctx.lineTo(centerX, centerY + halfHeight); // bottom
     this.ctx.lineTo(centerX - halfWidth, centerY); // left
     this.ctx.closePath();
+
+    if (fillColor) {
+      this.ctx.fillStyle = fillColor;
+      this.ctx.fill();
+    }
     this.ctx.stroke();
+  }
+
+  private fillShapeAt(x: number, y: number): void {
+    const shapeToFill = this.existingShapes.find((shape) =>
+      this.isPointInShape(x, y, shape)
+    );
+
+    if (shapeToFill) {
+      shapeToFill.fillColor = this.fillColor;
+
+      const messagePayload = {
+        type: "chat",
+        message: JSON.stringify({
+          shape: shapeToFill,
+        }),
+        roomID: this.roomID,
+      };
+      this.socket.send(JSON.stringify(messagePayload));
+      this.clearCanvas();
+    }
   }
 
   downloadAsJPEG(slug?: string) {

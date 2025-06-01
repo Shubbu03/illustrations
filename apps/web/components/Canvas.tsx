@@ -14,7 +14,8 @@ export type Tool =
   | "pencil"
   | "line"
   | "diamond"
-  | "eraser";
+  | "eraser"
+  | "fill";
 
 const fetchCanvasID = async (slug: string) => {
   try {
@@ -61,6 +62,7 @@ export default function Canvas({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [game, setGame] = useState<Game>();
   const [selectedTool, setSelectedTool] = useState<Tool>("circle");
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const { resolvedTheme } = useTheme();
   const router = useRouter();
@@ -74,6 +76,12 @@ export default function Canvas({
   useEffect(() => {
     game?.setTool(selectedTool);
   }, [selectedTool, game]);
+
+  useEffect(() => {
+    if (game && selectedColor !== undefined) {
+      game.setFillColor(selectedColor);
+    }
+  }, [selectedColor, game]);
 
   useEffect(() => {
     if (game && resolvedTheme) {
@@ -181,6 +189,8 @@ export default function Canvas({
       <ActionBar
         setSelectedTool={setSelectedTool}
         selectedTool={selectedTool}
+        selectedColor={selectedColor}
+        setSelectedColor={setSelectedColor}
       />
 
       <ShareModal
