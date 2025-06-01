@@ -388,15 +388,14 @@ export class Game {
 
     this.existingShapes.push(shape);
 
-    this.socket.send(
-      JSON.stringify({
-        type: "chat",
-        message: JSON.stringify({
-          shape,
-        }),
-        roomID: this.roomID,
-      })
-    );
+    const messagePayload = {
+      type: "chat",
+      message: JSON.stringify({
+        shape,
+      }),
+      roomID: this.roomID,
+    };
+    this.socket.send(JSON.stringify(messagePayload));
   };
 
   mouseMoveHandler = (e: MouseEvent) => {
@@ -601,13 +600,12 @@ export class Game {
       });
 
       if (shape.dbId) {
-        this.socket.send(
-          JSON.stringify({
-            type: "erase_chat",
-            chatId: shape.dbId,
-            roomID: this.roomID,
-          })
-        );
+        const erasePayload = {
+          type: "erase_chat",
+          chatId: shape.dbId,
+          roomID: this.roomID,
+        };
+        this.socket.send(JSON.stringify(erasePayload));
       }
     });
 

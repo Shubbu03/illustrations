@@ -5,9 +5,11 @@ import { authOptions } from "../../auth/[...nextauth]/options";
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const slug = (await params).slug;
+
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user) {
@@ -15,7 +17,6 @@ export async function DELETE(
     }
 
     const userID = session.user.id;
-    const { slug } = params;
 
     const room = await prisma.room.findUnique({
       where: { slug },
