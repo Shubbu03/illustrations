@@ -283,6 +283,7 @@ export class Game {
         this.ctx.moveTo(shape.startX, shape.startY);
         this.ctx.lineTo(shape.endX, shape.endY);
         this.ctx.stroke();
+        this.drawArrowhead(shape.startX, shape.startY, shape.endX, shape.endY);
       }
     });
 
@@ -403,6 +404,12 @@ export class Game {
     const currentX = coords.x;
     const currentY = coords.y;
 
+    if (this.selectedTool === "eraser") {
+      this.canvas.style.cursor = "none";
+    } else {
+      this.canvas.style.cursor = "crosshair";
+    }
+
     if (this.clicked) {
       if (this.selectedTool === "eraser") {
         this.eraserTrail.push({ x: currentX, y: currentY });
@@ -439,6 +446,7 @@ export class Game {
           this.ctx.moveTo(this.startX, this.startY);
           this.ctx.lineTo(currentX, currentY);
           this.ctx.stroke();
+          this.drawArrowhead(this.startX, this.startY, currentX, currentY);
         }
       }
     }
@@ -612,5 +620,31 @@ export class Game {
     if (shapesToErase.length > 0) {
       this.clearCanvas();
     }
+  }
+
+  private drawArrowhead(
+    fromX: number,
+    fromY: number,
+    toX: number,
+    toY: number,
+    angle = Math.PI / 6,
+    length = 10
+  ) {
+    const dx = toX - fromX;
+    const dy = toY - fromY;
+    const lineAngle = Math.atan2(dy, dx);
+
+    this.ctx.beginPath();
+    this.ctx.moveTo(toX, toY);
+    this.ctx.lineTo(
+      toX - length * Math.cos(lineAngle - angle),
+      toY - length * Math.sin(lineAngle - angle)
+    );
+    this.ctx.moveTo(toX, toY);
+    this.ctx.lineTo(
+      toX - length * Math.cos(lineAngle + angle),
+      toY - length * Math.sin(lineAngle + angle)
+    );
+    this.ctx.stroke();
   }
 }

@@ -2,8 +2,8 @@ import {
   Pencil,
   RectangleHorizontalIcon,
   Circle,
-  Minus,
   Eraser,
+  MoveUpRight,
 } from "lucide-react";
 import { Tool } from "./Canvas";
 import { IconButton } from "./IconButton";
@@ -57,7 +57,7 @@ export function ActionBar({
           setSelectedTool("line");
         }}
         activated={selectedTool === "line"}
-        icon={<Minus size={20} />}
+        icon={<MoveUpRight size={20} />}
       />
 
       <div
