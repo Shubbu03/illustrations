@@ -33,6 +33,15 @@ type Shape =
       endY: number;
       dbId?: number;
       localId?: string;
+    }
+  | {
+      type: "diamond";
+      centerX: number;
+      centerY: number;
+      width: number;
+      height: number;
+      dbId?: number;
+      localId?: string;
     };
 
 export class Game {
@@ -231,6 +240,14 @@ export class Game {
       case "pencil":
         if (shape2.type !== "pencil") return false;
         return JSON.stringify(shape1.points) === JSON.stringify(shape2.points);
+      case "diamond":
+        if (shape2.type !== "diamond") return false;
+        return (
+          shape1.centerX === shape2.centerX &&
+          shape1.centerY === shape2.centerY &&
+          shape1.width === shape2.width &&
+          shape1.height === shape2.height
+        );
       default:
         return false;
     }
@@ -284,6 +301,13 @@ export class Game {
         this.ctx.lineTo(shape.endX, shape.endY);
         this.ctx.stroke();
         this.drawArrowhead(shape.startX, shape.startY, shape.endX, shape.endY);
+      } else if (shape.type === "diamond") {
+        this.drawDiamond(
+          shape.centerX,
+          shape.centerY,
+          shape.width,
+          shape.height
+        );
       }
     });
 
@@ -378,6 +402,16 @@ export class Game {
         endX: coords.x,
         endY: coords.y,
       };
+    } else if (selectedTool === "diamond") {
+      const centerX = this.startX + width / 2;
+      const centerY = this.startY + height / 2;
+      shape = {
+        type: "diamond",
+        centerX,
+        centerY,
+        width: Math.abs(width),
+        height: Math.abs(height),
+      };
     }
 
     if (!shape) {
@@ -447,6 +481,12 @@ export class Game {
           this.ctx.lineTo(currentX, currentY);
           this.ctx.stroke();
           this.drawArrowhead(this.startX, this.startY, currentX, currentY);
+        } else if (selectedTool === "diamond") {
+          const width = currentX - this.startX;
+          const height = currentY - this.startY;
+          const centerX = this.startX + width / 2;
+          const centerY = this.startY + height / 2;
+          this.drawDiamond(centerX, centerY, width, height);
         }
       }
     }
@@ -547,6 +587,18 @@ export class Game {
           return distance <= tolerance;
         });
 
+      case "diamond": {
+        // Diamond collision detection using bounding box for simplicity
+        const halfWidth = shape.width / 2;
+        const halfHeight = shape.height / 2;
+        return (
+          x >= shape.centerX - halfWidth - tolerance &&
+          x <= shape.centerX + halfWidth + tolerance &&
+          y >= shape.centerY - halfHeight - tolerance &&
+          y <= shape.centerY + halfHeight + tolerance
+        );
+      }
+
       default:
         return false;
     }
@@ -645,6 +697,24 @@ export class Game {
       toX - length * Math.cos(lineAngle + angle),
       toY - length * Math.sin(lineAngle + angle)
     );
+    this.ctx.stroke();
+  }
+
+  private drawDiamond(
+    centerX: number,
+    centerY: number,
+    width: number,
+    height: number
+  ) {
+    const halfWidth = Math.abs(width) / 2;
+    const halfHeight = Math.abs(height) / 2;
+
+    this.ctx.beginPath();
+    this.ctx.moveTo(centerX, centerY - halfHeight); // top
+    this.ctx.lineTo(centerX + halfWidth, centerY); // right
+    this.ctx.lineTo(centerX, centerY + halfHeight); // bottom
+    this.ctx.lineTo(centerX - halfWidth, centerY); // left
+    this.ctx.closePath();
     this.ctx.stroke();
   }
 }

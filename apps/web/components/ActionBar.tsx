@@ -4,6 +4,7 @@ import {
   Circle,
   Eraser,
   MoveUpRight,
+  Diamond,
 } from "lucide-react";
 import { Tool } from "./Canvas";
 import { IconButton } from "./IconButton";
@@ -58,6 +59,13 @@ export function ActionBar({
         }}
         activated={selectedTool === "line"}
         icon={<MoveUpRight size={20} />}
+      />
+      <IconButton
+        onClick={() => {
+          setSelectedTool("diamond");
+        }}
+        activated={selectedTool === "diamond"}
+        icon={<Diamond size={20} />}
       />
 
       <div

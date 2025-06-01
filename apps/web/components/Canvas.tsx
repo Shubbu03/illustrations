@@ -7,7 +7,13 @@ import { useQuery } from "@tanstack/react-query";
 import { ActionBar } from "./ActionBar";
 import { Home } from "lucide-react";
 
-export type Tool = "circle" | "rectangle" | "pencil" | "line" | "eraser";
+export type Tool =
+  | "circle"
+  | "rectangle"
+  | "pencil"
+  | "line"
+  | "diamond"
+  | "eraser";
 
 const fetchCanvasID = async (slug: string) => {
   try {
