@@ -8,8 +8,6 @@ import {
   UserSearch,
   Loader2,
   PackageOpen,
-  Github,
-  Brush,
   Trash2,
   LogOut,
 } from "lucide-react";
@@ -18,6 +16,7 @@ import { useState, useRef, useEffect } from "react";
 import JoinCanvasDropdown from "../../components/JoinCanvasDropDown";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { signOut } from "next-auth/react";
+import Footer from "../../components/Footer";
 
 interface CanvasItem {
   id: string;
@@ -177,14 +176,14 @@ const Dashboard = () => {
                 className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
                 style={{ backgroundColor: "#7F8CAA" }}
               >
-                <Brush className="w-6 h-6 text-white" />
+                <Palette className="w-6 h-6 text-white" />
               </div>
               <div className="group">
                 <h1
                   className="text-2xl font-bold tracking-tight"
                   style={{ color: "#333446" }}
                 >
-                  Ilustraciones
+                  ilustraciones
                 </h1>
                 <div
                   className="h-0.5 w-0 group-hover:w-full transition-all duration-300 ease-out"
@@ -200,7 +199,10 @@ const Dashboard = () => {
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-3xl font-bold" style={{ color: "#333446" }}>
+              <h2
+                className="text-3xl font-semibold"
+                style={{ color: "#333446" }}
+              >
                 My Illustrations
               </h2>
               <div className="flex space-x-2">
@@ -393,26 +395,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <footer
-        className="w-full py-6 mt-auto"
-        style={{ backgroundColor: "#7F8CAA" }}
-      >
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-center">
-            <p className="text-white text-sm flex items-center gap-2">
-              Made with ❤️ by shubham
-              <a
-                href="https://github.com/Shubbu03"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 ml-2 hover:text-gray-200 transition-colors duration-200"
-              >
-                <Github className="w-4 h-4" />
-              </a>
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
