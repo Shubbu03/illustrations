@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "tsc -b",
+    "build": "pnpm --filter @repo/db generate && tsc -b",
     "start": "node dist/server.js",
     "dev": "pnpm run build && pnpm run start"
   },
