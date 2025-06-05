@@ -2,7 +2,6 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import WS_URL from "@repo/config/variables";
 import Canvas from "./Canvas";
 import { Home, RefreshCw } from "lucide-react";
 
@@ -15,7 +14,7 @@ export function RoomCanvas({ slug }: { slug: string }) {
   useEffect(() => {
     if (!wsToken) return;
 
-    const ws = new WebSocket(`${WS_URL}?token=${wsToken}`);
+    const ws = new WebSocket(`${process.env.WS_URL}?token=${wsToken}`);
 
     ws.onopen = () => {
       setSocket(ws);

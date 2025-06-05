@@ -8,7 +8,8 @@
     "GOOGLE_CLIENT_SECRET",
     "GITHUB_CLIENT_ID",
     "GITHUB_CLIENT_SECRET",
-    "JWT_SECRET"
+    "JWT_SECRET",
+    "WS_URL"
   ],
   "tasks": {
     "build": {
