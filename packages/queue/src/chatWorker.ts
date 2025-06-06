@@ -13,7 +13,7 @@ export const chatWorker = new Worker(
 
       if (jobType === "chat") {
         const { roomID, message, userID } = job.data;
-        console.log("Processing chat creation");
+        console.log("Processing chat creation!");
         const dataInsert = await prisma.chat.create({
           data: { roomID: Number(roomID), message, userID },
         });
