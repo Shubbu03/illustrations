@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/db/prisma";
 import { authOptions } from "../../auth/[...nextauth]/options";
 
 export async function GET(

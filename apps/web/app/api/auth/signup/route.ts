@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { hashPassword } from "@repo/auth/bcrypt";
 import { SignupSchema } from "@repo/types/zod";
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/db/prisma";
 
 export async function POST(request: Request) {
   try {
