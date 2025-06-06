@@ -13,8 +13,9 @@ export function RoomCanvas({ slug }: { slug: string }) {
 
   useEffect(() => {
     if (!wsToken) return;
-
-    const ws = new WebSocket(`${process.env.WS_URL}?token=${wsToken}`);
+    const ws = new WebSocket(
+      `${process.env.NEXT_PUBLIC_WS_URL}?token=${wsToken}`
+    );
 
     ws.onopen = () => {
       setSocket(ws);

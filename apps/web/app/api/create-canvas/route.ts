@@ -1,4 +1,4 @@
-import { prisma } from "@repo/db/prisma";
+import { prisma } from "@repo/db";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { generateSlug } from "random-word-slugs";

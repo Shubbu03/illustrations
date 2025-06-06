@@ -3,7 +3,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 
 import dotenv from "dotenv";
 import { chatQueue } from "@repo/queue";
-import { prisma } from "@repo/db/prisma";
+import { prisma } from "@repo/db";
 
 dotenv.config();
 

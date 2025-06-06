@@ -3,7 +3,7 @@ import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 import { NextAuthLoginCredentialsSchema, zodError } from "@repo/types/zod";
 import type { NextAuthOptions } from "next-auth";
-import { prisma } from "@repo/db/prisma";
+import { prisma } from "@repo/db";
 import { comparePassword } from "@repo/auth/bcrypt";
 import { signToken } from "@repo/auth/jwt/signToken";
 

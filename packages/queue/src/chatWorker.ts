@@ -1,6 +1,6 @@
 import { Worker } from "bullmq";
 import { redisOptions } from "./redisConnection";
-import { prisma } from "@repo/db/prisma";
+import { prisma } from "@repo/db";
 
 export const chatWorker = new Worker(
   "chatQueue",
