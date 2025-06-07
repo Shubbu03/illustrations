@@ -1,6 +1,6 @@
 # Ilustraciones 🎨
 
-A real-time collaborative drawing platform where creativity meets collaboration. Draw together with friends, colleagues, or anyone around the world on an infinite canvas.
+A real-time collaborative drawing platform where creativity meets collaboration. Draw together with friends, colleagues, or anyone around the world on the canvas.
 
 ## ✨ Features
 
