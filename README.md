@@ -1,84 +1,193 @@
-# Turborepo starter
+# Ilustraciones 🎨
 
-This Turborepo starter is maintained by the Turborepo core team.
+A real-time collaborative drawing platform where creativity meets collaboration. Draw together with friends, colleagues, or anyone around the world on an infinite canvas.
 
-## Using this example
+## ✨ Features
 
-Run the following command:
+### 🎨 **Intuitive Drawing Tools**
 
-```sh
-npx create-turbo@latest
+- **Pencil** - Free-hand drawing with smooth curves
+- **Shapes** - Rectangles, circles, diamonds, and lines with arrow heads
+- **Fill Tool** - Add colors to your shapes with a beautiful color palette
+- **Eraser** - Remove elements with precision
+- **Color Picker** - Choose from 10 beautiful preset colors
+
+### 🌐 **Real-time Collaboration**
+
+- **Live Drawing** - See everyone's strokes appear instantly as they draw
+- **WebSocket Technology** - Ultra-low latency for seamless collaboration
+- **Room-based Sessions** - Create private drawing rooms or join existing ones
+- **Multi-user Support** - No limits on concurrent collaborators
+
+### 🎯 **Canvas Features**
+
+- **Infinite Canvas** - Never run out of space for your creativity
+- **High DPI Support** - Crystal clear drawing on all devices
+- **Theme Support** - Light and dark modes for comfortable drawing
+- **Export** - Download your masterpieces as JPEG files
+- **Share** - Easy sharing with room codes
+
+### 🔐 **Authentication & Management**
+
+- **Multiple Auth Options** - Google and GitHub OAuth integration
+- **Personal Dashboard** - Manage all your illustrations in one place
+- **Secure Sessions** - JWT-based authentication with NextAuth
+
+## 🛠️ Tech Stack
+
+### **Frontend**
+
+- **Next.js 15** - React framework with App Router
+- **React 19** - Latest React with concurrent features
+- **TypeScript** - Type-safe development
+- **Tailwind CSS 4** - Utility-first styling
+- **TanStack Query** - Data fetching and state management
+- **Lucide React** - Beautiful, customizable icons
+
+### **Backend**
+
+- **WebSocket Server** - Real-time communication with native WebSocket
+- **NextAuth.js** - Authentication with OAuth providers
+- **Prisma** - Type-safe database ORM
+- **BullMQ** - Redis-based queue system for background jobs
+- **JWT** - Secure token-based authentication
+
+### **Infrastructure**
+
+- **Turborepo** - Monorepo build system for scalability
+- **Redis** - In-memory data store for queues and caching
+- **PostgreSQL** - Robust relational database (via Prisma)
+- **pnpm** - Fast, disk space efficient package manager
+
+### **Development Tools**
+
+- **ESLint** - Code linting and formatting
+- **Prettier** - Code formatting
+- **TypeScript** - Static type checking across the entire stack
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Node.js** 18 or higher
+- **pnpm** 9.0.0 or higher
+- **Redis** (for queue system)
+- **PostgreSQL** (for database)
+
+### Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/your-username/ilustraciones.git
+   cd ilustraciones
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   pnpm install
+   ```
+
+3. **Set up environment variables**
+   Create a `.env` file in the root directory:
+
+   ```env
+   # Database
+   DATABASE_URL="postgresql://username:password@localhost:5432/ilustraciones"
+
+   # Authentication
+   NEXTAUTH_SECRET="your-secret-here"
+   GOOGLE_CLIENT_ID="your-google-client-id"
+   GOOGLE_CLIENT_SECRET="your-google-client-secret"
+   GITHUB_CLIENT_ID="your-github-client-id"
+   GITHUB_CLIENT_SECRET="your-github-client-secret"
+
+   # JWT
+   JWT_SECRET="your-jwt-secret"
+
+   # WebSocket
+   WS_URL="ws://localhost:8080"
+
+   # Redis (for queue system)
+   REDIS_URL="redis://localhost:6379"
+   ```
+
+4. **Set up the database**
+
+   ```bash
+   pnpm --filter @repo/db generate
+   ```
+
+5. **Start development servers**
+
+   ```bash
+   pnpm dev
+   ```
+
+   This will start:
+
+   - **Web app** on `http://localhost:3000`
+   - **WebSocket server** on `ws://localhost:8080`
+
+## 📁 Project Structure
+
+```
+ilustraciones/
+├── apps/
+│   ├── web/                 # Next.js frontend application
+│   └── ws-backend/          # WebSocket server for real-time features
+├── packages/
+│   ├── auth/               # Authentication utilities
+│   ├── db/                 # Prisma database schema and client
+│   ├── queue/              # BullMQ queue system
+│   ├── types/              # Shared TypeScript types
+│   ├── config/             # Shared configuration
+│   ├── eslint-config/      # ESLint configuration
+│   └── typescript-config/  # TypeScript configuration
+└── README.md
 ```
 
-## What's inside?
+## 🤝 Contributing
 
-This Turborepo includes the following packages/apps:
+We welcome contributions from everyone! Whether you're fixing bugs, adding features, or improving documentation, your help is appreciated.
 
-### Apps and Packages
+### How to Contribute
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+1. **Fork the repository**
+2. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
+3. **Make your changes**
+4. **Commit your changes** (`git commit -m 'Add some amazing feature'`)
+5. **Push to the branch** (`git push origin feature/amazing-feature`)
+6. **Open a Pull Request**
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+### Development Guidelines
 
-### Utilities
+- Follow the existing code style and conventions
+- Write meaningful commit messages
+- Add tests for new features when applicable
+- Update documentation as needed
+- Ensure all checks pass before submitting PR
 
-This Turborepo has some additional tools already setup for you:
+### Areas We Need Help With
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+- 🎨 **UI/UX Improvements** - Make the interface even more intuitive
+- 🚀 **Performance Optimizations** - Improve canvas rendering and WebSocket efficiency
+- 📱 **Mobile Experience** - Better touch support and responsive design
+- 🧪 **Testing** - Add unit and integration tests
+- 📚 **Documentation** - Improve guides and API documentation
+- 🌍 **Internationalization** - Add support for multiple languages
 
-### Build
+## 📄 License
 
-To build all apps and packages, run the following command:
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-```
-cd my-turborepo
-pnpm build
-```
+## 🙏 Acknowledgments
 
-### Develop
+- Built with ❤️ by the open source community
+- Icons by [Lucide](https://lucide.dev/)
+- Inspired by collaborative tools like Figma and Miro
 
-To develop all apps and packages, run the following command:
+---
 
-```
-cd my-turborepo
-pnpm dev
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-npx turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-npx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+**Ready to start drawing?** Visit [ilustraciones.app](https://ilustraciones.app) and let your creativity flow!
