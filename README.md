@@ -21,7 +21,6 @@ A real-time collaborative drawing platform where creativity meets collaboration.
 
 ### 🎯 **Canvas Features**
 
-- **Infinite Canvas** - Never run out of space for your creativity
 - **High DPI Support** - Crystal clear drawing on all devices
 - **Theme Support** - Light and dark modes for comfortable drawing
 - **Export** - Download your masterpieces as JPEG files
